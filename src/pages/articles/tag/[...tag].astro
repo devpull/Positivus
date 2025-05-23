@@ -7,14 +7,33 @@ import { capitalize } from "../../../utils";
 
 const { tag } = Astro.params;
 
+
 if(tag === undefined) {
   throw new Error('Tag is required');
 }
 
-const allBlogArticles: CollectionEntry<'blog'>[] = (await getCollection('blog'))
-  .sort((a:CollectionEntry<'blog'>, b:CollectionEntry<'blog'>) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+// const allBlogArticles: CollectionEntry<'blog'>[] = (await getCollection('blog'))
+//   .sort((a:CollectionEntry<'blog'>, b:CollectionEntry<'blog'>) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const tagArticles = allBlogArticles.filter(article => article.data.tags.includes(tag));
+// const tagArticles = allBlogArticles.filter(article => article.data.tags.includes(tag));
+
+export async function getStaticPaths() {
+  const articles: CollectionEntry<'blog'>[] = (await getCollection('blog'))
+   .sort((a:CollectionEntry<'blog'>, b:CollectionEntry<'blog'>) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+  const uniqueTags = [...new Set(articles.map((article) => article.data.tags).flat())];
+
+  return uniqueTags.map((tag) => {
+    const tagArticles = articles.filter((article) => article.data.tags.includes(tag));
+
+    return {
+      params: { tag },
+      props: { tagArticles: tagArticles }
+    }
+  });
+}
+
+const { tagArticles } = Astro.props;
 ---
 
 <MainLayout title="Search Results">
