@@ -8,7 +8,7 @@ import node from '@astrojs/node';
 export default defineConfig({
   // site: "https://positivustheme.vercel.app",
   integrations: [tailwind()],
-  output: 'server',
+  output: 'static',
   adapter: node({
     mode: 'standalone',
   }),
